@@ -1,49 +1,122 @@
 #include <iostream>
 using namespace std;
-
-template<typename T>
-//Основний метод, приймає 3 аргументі, перший масив, другий та розмір цих масивів
-bool checkingAlg(T *str1, T *str2 , int size)
+template <typename T>
+bool checkingAlg(T * str1, T *str2,int size)
 {
+    int *indexArr = new int [size];
 
-	//находимо перший элемент першого масива
-	char firstEl = str1[0];
-	//k - це ітератор для другого масива
-	int k = 0;
-	while (firstEl != str2[k])
-	{
-		//якщо другий масив це зсув першого, то находимо місце, де знаходится перший елемент першого масива в другому масиві
-		k++;
-		//якщо такого місця немає => масиви різні
-		if (k > size) return false;
-		
-	}
-	//після того як знайшли потрібну точку старту, перевіряємо всі ішні елементи рядка на корректність елементів та правильність місцезнаходження
-	for (int i = 0; i < size; i++)
-	{
-		if (k>=size)
-			k = 0;
+    int it1 = 0, it2 = 1;
+    indexArr[0] = 0;
+    while (it2 != size) 
+    {
+        if (str2[it2] == str2[it1])
+        {
+            //задаємо масив індексів 
+            indexArr[it2] = it1 + 1;
+            it2++;
+            it1++;
+        }
+        else if (it1 == 0)
+        {
+            indexArr[it2] = 0;
+            it2++;
+        }
+        else
+            it1 = indexArr[it1 - 1];
+    }
+    it1 = 0, it2 = 0;
+    while (it2 != size)
+    {
+        //якщо перший итератор дійшов до кінця, то алгоритм повертає його до початку и порівнює перші елементи 
+        if (it1 == size)
+            it1 = 0;
+        if (str1[it1] == str2[it2])
+        {
+            //якщо елементи однакові ми проходимо далі в другому масиві та порівнюємо наступний символ 
+            it1++;
+            it2++;
+            if (it2 == size)
+            {
+               
+                return true;
+            }
+        }
+        else if (it2 == 0 )
+        {
+            //якщо символи різні та другий итератор = 0, ми збільшуємо перший, а також якщо перший буде = розміру масива
+            //це буде показувати, що ми пройшли весь другий масив та не знайшли символ як в першому => масиви різні
+            it1++;
+            if (it1 == size)
+            {
+              
+                return false;
+            }
+        }
+        else
+        {
+            //якщо символи різні та другий итератор != 0, ми повертаємось до попереднього символа та порівнюємо інші символи другого масива
 
-		//якщо хоча би один різний => рядки не є зсувом один одного
-		if (str1[i]!=str2[k])
-			return false;
+           it2 = indexArr[it2 - 1];
 
-		k++;
-	}
-	//повертаємо true, якщо все в нормі
-	return true;
+        }
+           
+    }
+    return false;
 }
+void UnitTest()
+{
+    const int size = 8;
+    char* str1 = new char [size] {"zxcvbnm"}; //1
+    char* str2 = new char [size] {"nmzxcvb"};
+    cout << endl << checkingAlg(str1, str2, size - 1) << endl;
+
+    str1 = new char [size] {"zxcvbnm"}; //0
+    str2 = new char [size] {"gnmzcvb"};
+    cout << endl << checkingAlg(str1, str2, size - 1) << endl;
 
 
+    str1 = new char [4] {"abc"}; //1
+    str2 = new char [4] {"cab"};
+    cout << endl << checkingAlg(str1, str2, 3) << endl;
+
+    str1 = new char [5] {"qwer"}; //1
+    str2 = new char [5] {"rqwe"};
+    cout << endl << checkingAlg(str1, str2, 4) << endl;
+
+    str1 = new char [5] {"qwer"}; //1
+    str2 = new char [5] {"rqwe"};
+    cout << endl << checkingAlg(str1, str2, 4) << endl;
+
+    str1 = new char [5] {"уwer"}; //0
+    str2 = new char [5] {"аааа"};
+    cout << endl << checkingAlg(str1, str2, 4) << endl;
+
+    str1 = new char [5] {"уggg"}; //0
+    str2 = new char [5] {"rqwe"};
+    cout << endl << checkingAlg(str1, str2, 4) << endl;
+
+    str1 = new char [3] {"ab"}; //1
+    str2 = new char [3] {"ba"};
+    cout << endl << checkingAlg(str1, str2, 2) << endl;
+
+
+    str1 = new char [3] {"ab"}; //1
+    str2 = new char [3] {"ba"};
+    cout << endl << checkingAlg(str1, str2, 2) << endl;
+
+    str1 = new char [7] {"qwerty"}; //1
+    str2 = new char [7] {"yqwert"};
+    cout << endl << checkingAlg(str1, str2, 6) << endl;
+
+    str1 = new char [23] {"aaaaaaaaaaaaaaaaaaabab"}; //1
+    str2 = new char [23] {"abaaaaaaaaaaaaaaaaaaab"};
+    cout << endl << checkingAlg(str1, str2, 22) << endl;
+}
 int main()
 {
-	//Варіант №2 
-	//Розробіть алгоритм, який за лінійний час визначав би, чи є текстовий рядок Т циклічним зсувом іншого рядка Т* (наприклад, abc та cab).
-	setlocale(LC_ALL, "rus");
-	const int size = 8;
-	char* str1 = new char [size] {"zxcvbnm"};
-	char* str2 = new char [size] {"nmzxcvb"};
-	cout << checkingAlg(str1, str2, size-1)<<endl;
-	system("pause");
-	return 0;
+    const int size = 8;
+    char *str1 = new char [size]  { "zxcvbnm" };
+    char *str2= new char [size]  { "mzxcvbn" };
+    UnitTest();
+    cout <<endl<< checkingAlg(str1, str2, size - 1) << endl;
 }
